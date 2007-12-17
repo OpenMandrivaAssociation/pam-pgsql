@@ -14,7 +14,6 @@ Source:		http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/lib%name-%{version}
 Patch0:     pam-pgsql.null.patch
 Requires:	pam
 BuildRequires:	pam-devel, postgresql-devel, libmhash-devel
-BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 
 %description
 This is a module that allows people to login to PAM-aware applications by
