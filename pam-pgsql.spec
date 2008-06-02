@@ -1,6 +1,6 @@
 %define name	pam-pgsql
-%define version 0.6.1
-%define release %mkrel 4
+%define version 0.6.4
+%define release %mkrel 1
 
 Summary:	Postgresql authentication for PAM
 Name:		%{name}
@@ -10,7 +10,7 @@ Epoch:      1
 License:	GPL
 Group:		System/Libraries
 URL:		http://sourceforge.net/projects/pam-pgsql
-Source:		http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/lib%name-%{version}.tar.bz2
+Source:		http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/%{name}_%{version}.tar.gz
 Patch0:     pam-pgsql.null.patch
 Requires:	pam
 BuildRequires:	pam-devel, postgresql-devel, libmhash-devel
