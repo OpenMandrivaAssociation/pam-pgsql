@@ -1,6 +1,6 @@
 %define name	pam-pgsql
 %define version 0.6.4
-%define release %mkrel 1
+%define release %mkrel 2
 
 Summary:	Postgresql authentication for PAM
 Name:		%{name}
