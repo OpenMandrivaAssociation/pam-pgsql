@@ -1,6 +1,6 @@
 %define name	pam-pgsql
 %define version 0.6.4
-%define release %mkrel 2
+%define release %mkrel 3
 
 Summary:	Postgresql authentication for PAM
 Name:		%{name}
@@ -12,6 +12,8 @@ Group:		System/Libraries
 URL:		http://sourceforge.net/projects/pam-pgsql
 Source:		http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/%{name}_%{version}.tar.gz
 Patch0:     pam-pgsql.null.patch
+# submit upstream:
+Patch1:     pam-pgsql-session-query.patch
 Requires:	pam
 BuildRequires:	pam-devel, postgresql-devel, libmhash-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
@@ -22,7 +24,8 @@ authenticating to a Postgresql database.
 
 %prep
 %setup -q
-%patch -p0 -b .null
+%patch0 -p0 -b .null
+%patch1 -p0 -b .session
 
 %build
 %configure --with-postgres=%_includedir/pgsql --libdir=/%_lib/security
@@ -70,5 +73,4 @@ rm -rf %buildroot
 %doc CREDITS README
 /%_lib/security/pam_pgsql.*
 %attr(600, root, root) %config(noreplace) %_sysconfdir/pam_pgsql.conf
-
 
