@@ -13,6 +13,7 @@ URL:		http://sourceforge.net/projects/pam-pgsql
 Source:		http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/%{name}_%{version}.tar.gz
 Patch0:     pam-pgsql.null.patch
 # submit upstream:
+# https://sourceforge.net/tracker/index.php?func=detail&aid=2044002&group_id=62198&atid=499729
 Patch1:     pam-pgsql-session-query.patch
 Requires:	pam
 BuildRequires:	pam-devel, postgresql-devel, libmhash-devel
