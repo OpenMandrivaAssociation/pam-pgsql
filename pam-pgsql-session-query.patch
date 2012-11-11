@@ -1,0 +1,175 @@
+diff -p -up ./pam_mod_misc.h.session ./pam_mod_misc.h
+--- ./pam_mod_misc.h.session	2005-05-25 19:02:56.000000000 +0200
++++ ./pam_mod_misc.h	2008-08-09 16:34:56.000000000 +0200
+@@ -62,6 +62,8 @@ struct module_options {
+     char *auth_fail_query;
+     char *acct_query;
+     char *pwd_query;
++    char *session_open_query;
++    char *session_close_query;
+ /*old*/
+     char *database;
+     char *table;
+diff -p -up ./pam_pgsql.c.session ./pam_pgsql.c
+--- ./pam_pgsql.c.session	2008-05-25 01:41:16.000000000 +0200
++++ ./pam_pgsql.c	2008-08-09 16:36:02.000000000 +0200
+@@ -82,6 +82,10 @@ set_module_option(const char *option, st
+ 		options->acct_query = strdup(val);
+ 	} else if(!strcmp(buf, "pwd_query")) {
+ 		options->pwd_query = strdup(val);        
++	} else if(!strcmp(buf, "session_open_query")) {
++		options->session_open_query = strdup(val);        
++	} else if(!strcmp(buf, "session_close_query")) {
++		options->session_close_query = strdup(val);        
+ 	} else if(!strcmp(buf, "database")) {
+ 		options->database = strdup(val); /* deprecated by connect*/
+ 	} else if(!strcmp(buf, "table")) {
+@@ -266,6 +270,8 @@ get_module_options(int argc, const char 
+ static void
+ free_module_options(struct module_options *options)
+ {
++    if(options == NULL) /* Don't try to free NULL struct */
++        return;
+ 	if(options->pg_conn_str)
+ 		free(options->pg_conn_str);
+ 	if(options->auth_query)
+@@ -274,6 +280,10 @@ free_module_options(struct module_option
+ 		free(options->acct_query);
+ 	if(options->pwd_query)
+ 		free(options->pwd_query);
++    if(options->session_open_query)
++        free(options->session_open_query);
++    if(options->session_close_query)
++        free(options->session_close_query);
+ 	if(options->database)
+ 		free(options->database);
+ 	if(options->table)
+@@ -571,7 +581,7 @@ auth_verify_password(const char *service
+ PAM_EXTERN int
+ pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv)
+ {
+-	struct module_options *options;
++	struct module_options *options = NULL;
+ 	const char *user, *password, *rhost;
+ 	int rc;
+ 	PGresult *res;
+@@ -623,7 +633,7 @@ PAM_EXTERN int
+ pam_sm_acct_mgmt(pam_handle_t *pamh, int flags, int argc,
+                             const char **argv)
+ {
+-	struct module_options *options;
++	struct module_options *options = NULL;
+ 	const char *user, *rhost;
+ 	int rc;
+ 	PGconn *conn;
+@@ -676,7 +686,7 @@ pam_sm_acct_mgmt(pam_handle_t *pamh, int
+ PAM_EXTERN int
+ pam_sm_chauthtok(pam_handle_t *pamh, int flags, int argc, const char **argv)
+ {
+-	struct module_options *options;
++	struct module_options *options = NULL;
+ 	int rc;
+ 	const char *user, *pass, *newpass, *rhost;
+ 	const void *oldtok;
+@@ -756,3 +766,66 @@ pam_sm_setcred(pam_handle_t *pamh, int f
+ {
+ 	return PAM_SUCCESS;
+ }
++
++PAM_EXTERN int
++pam_sm_open_session(pam_handle_t *pamh, int flags,
++            int argc, const char **argv)
++{
++	struct module_options *options = NULL;
++	const char *user, *rhost;
++	int rc;
++	PGresult *res;
++	PGconn *conn;	
++	
++	user = NULL; rhost = NULL;
++
++	if ((rc = get_module_options(argc, argv, &options)) == PAM_SUCCESS) {
++	if (options->session_open_query) {
++	    if ((rc = pam_get_item(pamh, PAM_RHOST, (const void **)&rhost)) == PAM_SUCCESS) {
++		if ((rc = pam_get_user(pamh, &user, NULL)) == PAM_SUCCESS) {
++			DBGLOG("Session opened for user: %s", user);
++			if ((conn = pg_connect(options))) {
++            pg_execParam(conn, &res, options->session_open_query, pam_get_service(pamh), user, NULL, NULL);
++			PQclear(res);
++			PQfinish(conn);
++			}
++		}
++        }
++    }
++	free_module_options(options);
++    }
++
++    return (PAM_SUCCESS);
++}
++
++PAM_EXTERN int
++pam_sm_close_session(pam_handle_t *pamh, int flags,
++            int argc, const char *argv[])
++{
++	struct module_options *options = NULL;
++	const char *user, *rhost;
++	int rc;
++	PGresult *res;
++	PGconn *conn;	
++	
++	user = NULL; rhost = NULL;
++
++	if ((rc = get_module_options(argc, argv, &options)) == PAM_SUCCESS) {
++	if (options->session_close_query) {
++	    if ((rc = pam_get_item(pamh, PAM_RHOST, (const void **)&rhost)) == PAM_SUCCESS) {
++		if ((rc = pam_get_user(pamh, &user, NULL)) == PAM_SUCCESS) {
++			DBGLOG("Session opened for user: %s", user);
++			if ((conn = pg_connect(options))) {
++            pg_execParam(conn, &res, options->session_close_query, pam_get_service(pamh), user, NULL, NULL);
++			PQclear(res);
++			PQfinish(conn);
++			}
++		}
++        }
++    }
++	free_module_options(options);
++    }
++
++    return (PAM_SUCCESS);
++}
++
+diff -p -up ./README.session ./README
+--- ./README.session	2005-06-01 20:02:59.000000000 +0200
++++ ./README	2008-08-09 16:36:49.000000000 +0200
+@@ -54,6 +54,7 @@ For example:
+ auth        required    pam_pgsql.so 
+ account     required    pam_pgsql.so
+ password    required    pam_pgsql.so
++session     required    pam_pgsql.so
+ 
+ Or:
+ 
+@@ -89,15 +90,17 @@ pwd_query = update account set user_pass
+ Configuration Options
+ =====================
+ 
+-    connect 		- the database connection string (see http://www.postgresql.org/docs/7.4/interactive/libpq.html#LIBPQ-CONNECT)
++    connect 		   - the database connection string (see http://www.postgresql.org/docs/7.4/interactive/libpq.html#LIBPQ-CONNECT)
+ 			  overrides other connection specific options
+-    auth_query		- authentication query (should return one column -- password)
++    auth_query		   - authentication query (should return one column -- password)
+ 			  overrides other authentication specific options
+-    auth_succ_query	- query to be executed after successful authentication
+-    auth_fail_query	- query to be executed after failed authentication
+-    acct_query		- account options query (should return 3 boolean columns -- expired, new password required and password is null)
++    auth_succ_query	   - query to be executed after successful authentication
++    auth_fail_query	   - query to be executed after failed authentication
++    session_open_query - query to be executed on session start
++    session_close_query - query to be executed on session end
++    acct_query		   - account options query (should return 3 boolean columns -- expired, new password required and password is null)
+ 			  overrides other account specific options
+-    pwd_query		- query to be executed for password changing 
++    pwd_query		   - query to be executed for password changing 
+ 			  overrides other settings related to changing password
+ 
+ You can use %u as username, %p as (new) password, %h for hostname of client
