@@ -1,6 +1,6 @@
 %define name	pam-pgsql
 %define version 0.6.4
-%define release %mkrel 5
+%define release %mkrel 4
 
 Summary:	Postgresql authentication for PAM
 Name:		%{name}
@@ -74,4 +74,47 @@ rm -rf %buildroot
 %doc CREDITS README
 /%_lib/security/pam_pgsql.*
 %attr(600, root, root) %config(noreplace) %_sysconfdir/pam_pgsql.conf
+
+
+
+%changelog
+* Fri Sep 04 2009 Thierry Vignaud <tvignaud@mandriva.com> 1:0.6.4-4mdv2010.0
++ Revision: 430232
+- rebuild
+
+  + Olivier Thauvin <nanardon@mandriva.org>
+    - add patch url on sourceforge
+
+* Sat Aug 09 2008 Olivier Thauvin <nanardon@mandriva.org> 1:0.6.4-3mdv2009.0
++ Revision: 270053
+- allow to run query on session start and close
+
+* Fri Aug 08 2008 Thierry Vignaud <tvignaud@mandriva.com> 1:0.6.4-2mdv2009.0
++ Revision: 268357
+- rebuild early 2009.0 package (before pixel changes)
+
+* Mon Jun 02 2008 Olivier Thauvin <nanardon@mandriva.org> 1:0.6.4-1mdv2009.0
++ Revision: 214269
+- 0.6.4
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tvignaud@mandriva.com>
+    - kill re-definition of %%buildroot on Pixel's request
+
+
+* Sat Mar 10 2007 Olivier Thauvin <nanardon@mandriva.org> 0.6.1-4mdv2007.1
++ Revision: 141060
+- rebuild
+- Import pam-pgsql
+
+* Thu Feb 09 2006 Olivier Thauvin <nanardon@mandriva.org> 0.6.1-3mdk
+- fix upload, change software source
+
+* Sat Feb 04 2006 Olivier Thauvin <nanardon@mandriva.org> 0.6.1-2mdk
+- Fix desc and summary
+
+* Sat Feb 04 2006 Olivier Thauvin <nanardon@mandriva.org> 0.9.3
+- Initial spec
 
