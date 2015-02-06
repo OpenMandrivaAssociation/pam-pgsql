@@ -1,7 +1,7 @@
 Summary:	Postgresql authentication for PAM
 Name:		pam-pgsql
 Version:	0.7.3.1
-Release:	1
+Release:	2
 Epoch:		1
 License:	GPLv2+
 Group:		System/Libraries
