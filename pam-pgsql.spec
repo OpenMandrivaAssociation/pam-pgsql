@@ -18,7 +18,7 @@ This is a module that allows people to login to PAM-aware applications by
 authenticating to a Postgresql database.
 
 %files
-%doc CREDITS README
+%doc CREDITS README CHANGELOG COPYRIGHT sample.sql
 %{_libdir}/security/pam_pgsql.*
 %attr(600, root, root) %config(noreplace) %{_sysconfdir}/pam_pgsql.conf
 
