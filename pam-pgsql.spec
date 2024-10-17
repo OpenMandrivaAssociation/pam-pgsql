@@ -5,7 +5,7 @@ Release:	2
 Epoch:		1
 License:	GPLv2+
 Group:		System/Libraries
-Url:		http://sourceforge.net/projects/pam-pgsql
+Url:		https://sourceforge.net/projects/pam-pgsql
 Source0:	http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/%{name}-%{version}.tar.gz
 BuildRequires:	mhash-devel
 BuildRequires:	pam-devel
