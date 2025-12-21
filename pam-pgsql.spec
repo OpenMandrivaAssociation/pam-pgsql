@@ -7,6 +7,11 @@ License:	GPLv2+
 Group:		System/Libraries
 Url:		https://sourceforge.net/projects/pam-pgsql
 Source0:	http://ovh.dl.sourceforge.net/sourceforge/pam-pgsql/%{name}-%{version}.tar.gz
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	mhash-devel
 BuildRequires:	pam-devel
 BuildRequires:	postgresql-devel
